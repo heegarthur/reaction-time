@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>reaction time</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div id="text-element"></div>
+<button id="start-btn">Start</button>
+
+<div id="timer-container" style="display:none;">
+    <span id="timer">00:00:00.00</span>
+    <button id="pause-btn">Pause</button>
+    <div style="margin-top: 1em;"></div>
+    <button id="stop-btn">Restart program</button>
+</div>
+
+<div style="margin-top: 5em;"></div>
+
+<div id="editBox">
+    <div id="edit">edit</div>
+    <div>random time (ms) after set</div>
+    <div>Set (min & max)</div>
+    <input id="t5" type="number" step="1000" oninput="saveTimes()" placeholder="min">
+    <input id="t6" type="number" step="1000" oninput="saveTimes()" placeholder="max">
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>

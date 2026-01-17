@@ -1,0 +1,110 @@
+body {
+    margin: 0;
+    padding: 0;
+    background-color: #121212; /* bijna zwart */
+    font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, Arial, sans-serif;
+    color: #e0e0e0; /* lichtgrijs */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    min-height: 100vh;
+}
+
+#text-element {
+    margin-top: 4rem;
+    font-size: clamp(2.8rem, 7vw, 4.5rem);
+    font-weight: 800;
+    letter-spacing: 2px;
+    color: #ff4c4c; /* krachtig rood */
+    text-shadow: 0 0 8px rgba(255, 76, 76, 0.7);
+}
+
+button {
+    background: linear-gradient(145deg, #800000, #b22222);
+    color: #f0f0f0;
+    border: none;
+    padding: 1rem 3rem;
+    font-size: 1.25rem;
+    font-weight: 700;
+    border-radius: 1.6rem;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(178, 34, 34, 0.6);
+    transition: background 0.3s ease;
+}
+
+button:hover {
+    background: linear-gradient(145deg, #b22222, #800000);
+}
+
+button:active {
+    transform: scale(0.97);
+    box-shadow: 0 2px 6px rgba(178, 34, 34, 0.8);
+}
+
+#pause-btn {
+    background: linear-gradient(145deg, #b22222, #800000);
+    color: #fff0f0;
+    box-shadow: 0 4px 10px rgba(255, 70, 70, 0.7);
+}
+
+#stop-btn {
+    background: linear-gradient(145deg, #ff0000, #8b0000);
+    color: #fff5f5;
+    box-shadow: 0 4px 10px rgba(255, 0, 0, 0.8);
+}
+
+#timer-container {
+    margin-top: 3rem;
+    padding: 3rem 3.5rem;
+    border-radius: 1.6rem;
+    background-color: #1f1f1f; /* donkergrijs */
+    border: 2px solid rgba(255, 76, 76, 0.3);
+}
+
+#timer {
+    font-family: "JetBrains Mono", "Courier New", monospace;
+    font-size: clamp(3rem, 8vw, 5rem);
+    font-weight: 700;
+    color: #ff4c4c;
+    text-shadow: 0 0 15px rgba(255, 76, 76, 0.7);
+}
+
+#editBox {
+    width: 100%;
+    margin-top: auto;
+    background: #1a1a1a;
+    padding: 2.5rem 0 3rem;
+    border-top: 1px solid #333333;
+}
+
+#editBox #edit {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #ff4c4c;
+}
+
+#editBox div {
+    margin-top: 1.5rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #d76b6b;
+}
+
+#editBox input {
+    width: 80%;
+    max-width: 320px;
+    margin-top: 0.6rem;
+    padding: 0.8rem 1rem;
+    border-radius: 12px;
+    border: 1px solid #551111;
+    background-color: #2a2a2a;
+    color: #f0dcdc;
+    font-size: 1.1rem;
+    outline: none;
+    transition: border-color 0.3s ease;
+}
+
+#editBox input:focus {
+    border-color: #ff4c4c;
+}
