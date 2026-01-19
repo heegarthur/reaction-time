@@ -1,19 +1,70 @@
-const setAudio = new Audio(setFile);
-const pistolAudio = new Audio(pistolFile);
+const textEl = document.getElementById("text-element");
+const startBtn = document.getElementById("start-btn");
+const pauseBtn = document.getElementById("pause-btn");
+const stopBtn = document.getElementById("stop-btn");
+const timerContainer = document.getElementById("timer-container");
+const timerDisplay = document.getElementById("timer");
+const editBox = document.getElementById("editBox");
+
+const setAudio = new Audio("set.mp3");
+const pistolAudio = new Audio("pistol.mp3");
 
 let timerInterval = null;
 let paused = false;
 let startTime = 0;
 let elapsed = 0;
 
-// AudioContext voor analyse
-const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-const source = audioCtx.createMediaElementSource(pistolAudio);
-const analyser = audioCtx.createAnalyser();
-source.connect(analyser);
-analyser.connect(audioCtx.destination);
+const defaults = {
+  minSet: 1000,
+  maxSet: 3000
+};
 
-const data = new Uint8Array(analyser.fftSize);
+let audioCtx = null;
+let analyser = null;
+let source = null;
+let data = null;
+
+function initAudioContext() {
+  if (audioCtx) return;
+
+  audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  source = audioCtx.createMediaElementSource(pistolAudio);
+  analyser = audioCtx.createAnalyser();
+
+  source.connect(analyser);
+  analyser.connect(audioCtx.destination);
+
+  analyser.fftSize = 2048;
+  data = new Uint8Array(analyser.fftSize);
+}
+
+function format(ms) {
+  const cs = Math.floor((ms % 1000) / 10);
+  const s = Math.floor(ms / 1000) % 60;
+  const m = Math.floor(ms / 60000);
+  return (
+    String(m).padStart(2, "0") + ":" +
+    String(s).padStart(2, "0") + ":" +
+    String(cs).padStart(2, "0")
+  );
+}
+
+function randDelay(min, max) {
+  return Math.random() * (max - min) + min;
+}
+
+function getNumberOr(def, val) {
+  const n = Number(val);
+  return Number.isFinite(n) ? n : def;
+}
+
+function saveTimes() {
+  localStorage.setItem("t5", document.getElementById("t5").value);
+  localStorage.setItem("t6", document.getElementById("t6").value);
+}
+
+document.getElementById("t5").value = localStorage.getItem("t5") || "";
+document.getElementById("t6").value = localStorage.getItem("t6") || "";
 
 function updateTimer() {
   if (!paused) {
@@ -25,9 +76,7 @@ function updateTimer() {
 
 async function warmUpAudio(audio) {
   audio.volume = 0;
-  try {
-    await audio.play();
-  } catch {}
+  try { await audio.play(); } catch {}
   audio.pause();
   audio.currentTime = 0;
   audio.volume = 1;
@@ -42,15 +91,17 @@ async function runSequence() {
   textEl.textContent = "Set";
 
   await setAudio.play().catch(() => {});
+
   const min = getNumberOr(defaults.minSet, document.getElementById("t5").value);
   const max = getNumberOr(defaults.maxSet, document.getElementById("t6").value);
+
   await new Promise(r => setTimeout(r, randDelay(min, max)));
 
   textEl.style.display = "none";
   timerContainer.style.display = "block";
 
   pistolAudio.currentTime = 0;
-  pistolAudio.play();
+  pistolAudio.play().catch(() => {});
 
   if (navigator.vibrate) navigator.vibrate(30);
 
@@ -68,6 +119,7 @@ async function runSequence() {
       requestAnimationFrame(detectSound);
     }
   }
+
   detectSound();
 }
 
@@ -75,35 +127,25 @@ function autoPauseOnUserAction() {
   if (!paused && timerInterval !== null) {
     paused = true;
     pauseBtn.textContent = "Resume";
-
-    // pauzeer audio ook
     setAudio.pause();
     pistolAudio.pause();
-
     clearInterval(timerInterval);
   }
 }
 
 pauseBtn.addEventListener("click", () => {
   if (!paused) {
-    // Pauzeren
     paused = true;
     pauseBtn.textContent = "Resume";
-
     setAudio.pause();
     pistolAudio.pause();
-
     clearInterval(timerInterval);
   } else {
-    // Hervatten
     paused = false;
     pauseBtn.textContent = "Pause";
-
     startTime = audioCtx.currentTime * 1000 - elapsed;
-
     setAudio.play().catch(() => {});
     pistolAudio.play().catch(() => {});
-
     timerInterval = setInterval(updateTimer, 10);
   }
 });
@@ -121,8 +163,6 @@ stopBtn.addEventListener("click", () => {
   startBtn.style.cursor = "pointer";
   pauseBtn.textContent = "Pause";
   editBox.style.display = "block";
-
-  // Reset audio
   setAudio.pause();
   setAudio.currentTime = 0;
   pistolAudio.pause();
@@ -130,15 +170,23 @@ stopBtn.addEventListener("click", () => {
 });
 
 startBtn.addEventListener("click", async () => {
+  initAudioContext();
+  if (audioCtx.state === "suspended") await audioCtx.resume();
+
   elapsed = 0;
   paused = false;
   timerDisplay.textContent = "00:00:00.00";
 
-  if (audioCtx.state === "suspended") await audioCtx.resume();
-
   await warmUpAudio(pistolAudio);
-
   await runSequence();
+});
+
+["click", "keydown", "touchstart"].forEach(evt => {
+  window.addEventListener(evt, () => {
+    if (audioCtx && audioCtx.state === "suspended") {
+      audioCtx.resume();
+    }
+  }, { once: true });
 });
 
 window.addEventListener("keydown", autoPauseOnUserAction);
